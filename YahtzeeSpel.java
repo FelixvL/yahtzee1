@@ -6,7 +6,9 @@ import java.util.Scanner;
 public class YahtzeeSpel {
 	Scanner scanner = new Scanner(System.in);
 	ArrayList<Dobbelsteen> dobbelstenen = new ArrayList();
-	Speler actieveSpeler = new Speler();
+	Speler actieveSpeler;
+	Speler[] spelers;
+	
 	int[] blockArray = new int[5]; // DOUBLE
 	int ronde;
 	YahtzeeSpel(){
@@ -16,8 +18,20 @@ public class YahtzeeSpel {
 		dobbelstenen.add(new Dobbelsteen());
 		dobbelstenen.add(new Dobbelsteen());
 	}
-	
+	void spelersAanmaken() {
+		System.out.println("Hoeveel spelers willen meespelen");
+		String aantalSpelersString = scanner.nextLine();
+		int aantalSpelers = Integer.parseInt(aantalSpelersString);
+		spelers = new Speler[aantalSpelers];
+		for(int x = 0 ; x < aantalSpelers; x++) {
+			System.out.println("Wat is de naam van speler " +(x+1));
+			String spelernaam = scanner.nextLine();
+			spelers[x] = new Speler(spelernaam, x);
+		}
+		actieveSpeler = spelers[0];
+	}
 	void spelen() {
+		spelersAanmaken();
 		System.out.println("spelen");
 		boolean speelDoor = true;
 		while(speelDoor) {
@@ -38,11 +52,15 @@ public class YahtzeeSpel {
 		System.out.println("Bedankt voor het spelen");
 	}
 	void toonGeschiedenis() {
-		for(Worp w : actieveSpeler.worpen) {
-			w.tonen();
+		for(Speler speler : spelers) {
+			System.out.println("De geschiedenis van " + speler.naam + " is:");
+			for(Worp w : speler.worpen) {
+				w.tonen();
+			}
 		}
 	}
 	void nieuweWorp() {
+		System.out.println("Aan de beurt is: " + actieveSpeler.naam);
 		werpenEnPrinten(1);
 		vasthouden();
 		werpenEnPrinten(2);
@@ -55,6 +73,14 @@ public class YahtzeeSpel {
 		for(Dobbelsteen db : dobbelstenen) {
 			db.locked = false;
 		}
+		volgendeSpeler();
+	}
+	void volgendeSpeler() {
+		int volgende = actieveSpeler.beurtnummer + 1;
+		if(volgende >= spelers.length) {
+			volgende = 0;
+		}
+		actieveSpeler = spelers[volgende];
 	}
 	void worpOpslaan(Speler speler) {
 		speler.worpen.add(
